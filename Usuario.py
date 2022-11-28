@@ -1,4 +1,4 @@
-from persona import *
+from Persona import *
 class Usuario(Persona):
     def __init__(self, nombrePersona, apellidoPersona, nombreUsuario, CI, contrasenia, edad, cuentaBancaria, saldoLibros, subscripcionMensual, librosComprados):
         super().__init__(nombrePersona, apellidoPersona, nombreUsuario, CI, contrasenia, edad)

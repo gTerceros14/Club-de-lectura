@@ -1,4 +1,4 @@
-from persona import *
+from Persona import *
 class Admin(Persona):
     def __init__(self, nombrePersona, apellidoPersona, nombreUsuario, CI, contrasenia, edad, permisoAdmin):
         super().__init__(nombrePersona, apellidoPersona, nombreUsuario, CI, contrasenia, edad)
