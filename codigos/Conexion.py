@@ -168,6 +168,40 @@ class Conexion:
         datos=resultado.fetchall()
         return datos
 
-    
+    #Kelly
+
+    def actualizarSaldo(self,cuentaBanco,monto):
+        sql="SELECT * FROM banco WHERE numeroCuenta=?"
+        parametros=(cuentaBanco,)
+        resultado=self.db.ejecutarConsulta(sql,parametros).fetchall()
+        password=input("ingrese password de banco: ")
+        if password==resultado[0][2]:
+            nuevoSaldo=resultado[0][3]-monto
+            if nuevoSaldo==0:
+                print("Saldo en 0 recargue porfavor")
+            if nuevoSaldo<0:
+                print("Necesita recargar Saldo insuficiente")
+            sql="UPDATE banco SET saldo=? WHERE numeroCuenta=?"
+            parametros=(nuevoSaldo,cuentaBanco)
+            self.db.ejecutarConsulta(sql,parametros)
+            return 1
+        else:
+            return 2
+    def recargarSaldo(self,cuentaBanco):
+        try:
+            sql="SELECT * FROM banco WHERE numeroCuenta=?"
+            resultado=self.db.ejecutarConsulta(sql,(cuentaBanco,)).fetchall()
+            print("="*25)
+            password=input("Password banco: ")
+            if password==resultado[0][2]:
+                recarga=float(input("ingrese monto a recargar: "))
+                nuevoSaldo=recarga+resultado[0][3]
+                sql="UPDATE banco SET saldo=? WHERE numeroCuenta=?"
+                self.db.ejecutarConsulta(sql,(nuevoSaldo,cuentaBanco))
+            else: 
+                print("contraseña incorrecta")
+            print("="*25)
+        except:
+            print("Error al recargar saldo")
 
 
