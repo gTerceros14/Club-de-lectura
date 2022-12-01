@@ -1,4 +1,4 @@
-import codigos.conexionDB as conn
+import conexionDB as conn
 class Conexion:
     def __init__(self):
         self.db = conn.DB()
@@ -98,7 +98,7 @@ class Conexion:
                 editorial=input("Editorial: ")
                 fechaPub=input("Fecha de publicacion: ")
                 sql="UPDATE libros SET nombre=?, autor=?, precio=?, categoria=?, editorial=?,fechaPub=? WHERE id_libro=?"
-                parametros=(nombre,autor,precio,categoria,editorial,id,fechaPub)
+                parametros=(nombre,autor,precio,categoria,editorial,fechaPub,id)
                 self.db.ejecutarConsulta(sql,parametros)
             else:
                 print(" No existe libro")
