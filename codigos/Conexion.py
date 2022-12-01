@@ -144,4 +144,30 @@ class Conexion:
         print("Saldo disponible: ",resultado[0][3])
         print("="*25)
         return resultado[0][3]
+    
+    #Edil 
+    def buscarLibro(self,id):
+        sql="SELECT * FROM libros WHERE id_libro=?"
+        parametros=(id,)
+        resultado=self.db.ejecutarConsulta(sql,parametros).fetchall()
+        if resultado==[]:
+            return False
+        else: 
+            return True
+    def buscarResenia(self,id,resenia):
+        sql="SELECT * FROM reseñas WHERE id_libro=? and id_reseña=?"
+        parametros=(id,resenia)
+        resultado=self.db.ejecutarConsulta(sql,parametros).fetchall()
+        if resultado==[]:
+            return False
+        else:
+            return True
+    def UsuariosExistentes(self):
+        sql="SELECT * FROM usuario"
+        resultado=self.db.ejecutarConsulta(sql)
+        datos=resultado.fetchall()
+        return datos
+
+    
+
 
