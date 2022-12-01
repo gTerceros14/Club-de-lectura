@@ -204,4 +204,83 @@ class Conexion:
         except:
             print("Error al recargar saldo")
 
+    #valentin 
+    def calificarLibro(self,usuario):
+        try:
+            self.MostrarLibro()
+            id=int(input("ingrese el ID libro a calificar: "))
+            if self.buscarLibro(id)==True:
+                calificacion=int(input("Calificacion 0 - 10 :  "))
+                if calificacion>=0 and calificacion <=10:
+                    sql="INSERT INTO calificacion(id_usuario,id_libro,calificacion) VALUES(?,?,?)"
+                    parametros=(usuario,id,calificacion)
+                    self.db.ejecutarConsulta(sql,parametros)
+                    sql="SELECT id_libro from libros"
+                    resultado=self.db.ejecutarConsulta(sql).fetchall()
+                    lista=[]
+                    listaSuma=[]
+                    for dato in resultado:
+                        dato=list(dato)
+                        lista=lista+dato
+                    for id in lista:
+                        suma=0
+                        listaSuma.clear()
+                        sql="SELECT calificacion.calificacion FROM calificacion WHERE id_libro=?"
+                        parametros=(id,)
+                        resultadoSuma=self.db.ejecutarConsulta(sql,parametros).fetchall()
+                        if resultadoSuma!=[]:
+                            for calificacion in resultadoSuma:
+                                calificacion=list(calificacion)
+                                listaSuma=listaSuma+calificacion
+                            suma= sum(listaSuma)/len(listaSuma)
+                            sql="UPDATE libros SET calificacion=? WHERE id_libro=?"
+                            parametros=(suma,id)
+                            self.db.ejecutarConsulta(sql,parametros)
+                        else:
+                            pass
+                    print("calificacion completa")
+                else:
+                    print("Rango calificacion no valido")
+            else:
+                print("no existe el libro")
+        except:
+            print("Error al ingresar el id")
+    
+    def calificarResenia(self):
+        self.verCalificacionResenia()
+        try:
+            idLibro=int(input("ingrese el id del libro"))
+            if self.buscarLibro(idLibro):
+                idResenia=int(input("Ingrese el id de la resenia a calificar "))
+                if self.buscarResenia(idLibro,idResenia):
+                    calificar=input("seleccione 'positivo' 'negativo'= ")
+                    sql="SELECT reseñas.calificacionPos, reseñas.calificacionNeg FROM reseñas WHERE id_reseña=? and id_libro=?"
+                    parametros=(idResenia,idLibro)
+                    resultado=self.db.ejecutarConsulta(sql,parametros).fetchall()
+                    if resultado!=[]:
+                        if calificar=='positivo':
+                            suma=resultado[0][0]+1
+                            sql="UPDATE reseñas SET calificacionPos=? WHERE id_libro=? and id_reseña=?"
+                            parametros=(suma,idLibro,idResenia)
+                            self.db.ejecutarConsulta(sql,parametros)
+                        elif calificar=='negativo':
+                            suma=resultado[0][1]+1
+                            sql="UPDATE reseñas SET calificacionNeg=? WHERE id_libro=? and id_reseña=?"
+                            parametros=(suma,idLibro,idResenia)
+                            self.db.ejecutarConsulta(sql,parametros)
+                else:
+                    print("no existe la reseña")
+            else:
+                print("no existe el libro")
+        except:
+            print("Error al calificar resenia ")
+
+    def VerificarContrasenia(self):
+        usuarioCliente=input("Ingrese usuario: ")
+        contraseniaCliente=input("Ingrese contrasenia: ")
+        sql="SELECT * FROM usuario WHERE nomUsuario =? And contrasenia=?"
+        parametros=(usuarioCliente,contraseniaCliente)
+        resultado=self.db.ejecutarConsulta(sql,parametros)
+        datos=resultado.fetchall()
+        return datos
 
