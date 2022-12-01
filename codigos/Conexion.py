@@ -57,3 +57,32 @@ class Conexion:
             print("Libro insertado")
         except:
             print("error al registrar libro")
+
+    def MostrarLibro(self):
+        sql="SELECT * FROM libros"
+        resultado=self.db.ejecutarConsulta(sql).fetchall()
+        for i in range(len(resultado)):
+            sql="SELECT reseñas.id_reseña, reseñas.reseña, reseñas.calificacionPos, reseñas.calificacionNeg FROM reseñas WHERE id_libro=?"
+            parametros=(resultado[i][0],)
+            resultadoResenia=self.db.ejecutarConsulta(sql,parametros).fetchall()
+            print("Id libro", resultado[i][0])
+            print("Nombre ", resultado[i][1])
+            print("Autor ", resultado[i][2])
+            print("Precio ", resultado[i][3])
+            print("Categoria", resultado[i][4])
+            print("Editorial", resultado[i][5])
+            print("Fecha de publicacion", resultado[i][6])
+            print("Calificacion :",resultado[i][7])
+            print("")
+            if resultadoResenia!=[]:
+                for j in range(len(resultadoResenia)):
+                    print("Id resenia ",resultadoResenia[j][0])
+                    print("Resenia ",resultadoResenia[j][1])
+                    print("Calificacion positiva ",resultadoResenia[j][2])
+                    print("Calificacaion Negativa ",resultadoResenia[j][3])
+                    print("")
+            else:
+                print(" sin reseña")
+            print("="*25)
+            print("")
+
