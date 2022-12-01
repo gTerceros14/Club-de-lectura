@@ -84,5 +84,24 @@ class Conexion:
             else:
                 print(" sin reseña")
             print("="*25)
-            print("")
+            print("")      
+            
+    def ActualizarLibro(self):
+        try:
+            id=int(input("ID libro: "))
+            if self.buscarLibro(id)==True:
+                nombre = input("Nombre: ")
+                autor=input("Autor: ")
+                precio=int(input("precio: "))
+                categoria=input("Categoria: ")
+                editorial=input("Editorial: ")
+                fechaPub=input("Fecha de publicacion: ")
+                sql="UPDATE libros SET nombre=?, autor=?, precio=?, categoria=?, editorial=?,fechaPub=? WHERE id_libro=?"
+                parametros=(nombre,autor,precio,categoria,editorial,id,fechaPub)
+                self.db.ejecutarConsulta(sql,parametros)
+            else:
+                print(" No existe libro")
+        except:
+            print(" error al actualizar libro" )
+    
 
