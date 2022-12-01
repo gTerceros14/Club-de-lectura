@@ -9,6 +9,7 @@ class Login:
         self._admin=Admin()
         self.db = conn.DB()
 
+
     def ingresar(self,dato):
 
         # FUNCIONES USUARIO
