@@ -144,4 +144,196 @@ class Conexion:
         print("Saldo disponible: ",resultado[0][3])
         print("="*25)
         return resultado[0][3]
+    
+    #Edil 
+    def buscarLibro(self,id):
+        sql="SELECT * FROM libros WHERE id_libro=?"
+        parametros=(id,)
+        resultado=self.db.ejecutarConsulta(sql,parametros).fetchall()
+        if resultado==[]:
+            return False
+        else: 
+            return True
+    def buscarResenia(self,id,resenia):
+        sql="SELECT * FROM reseñas WHERE id_libro=? and id_reseña=?"
+        parametros=(id,resenia)
+        resultado=self.db.ejecutarConsulta(sql,parametros).fetchall()
+        if resultado==[]:
+            return False
+        else:
+            return True
+    def UsuariosExistentes(self):
+        sql="SELECT * FROM usuario"
+        resultado=self.db.ejecutarConsulta(sql)
+        datos=resultado.fetchall()
+        return datos
 
+    #Kelly
+
+    def actualizarSaldo(self,cuentaBanco,monto):
+        sql="SELECT * FROM banco WHERE numeroCuenta=?"
+        parametros=(cuentaBanco,)
+        resultado=self.db.ejecutarConsulta(sql,parametros).fetchall()
+        password=input("ingrese password de banco: ")
+        if password==resultado[0][2]:
+            nuevoSaldo=resultado[0][3]-monto
+            if nuevoSaldo==0:
+                print("Saldo en 0 recargue porfavor")
+            if nuevoSaldo<0:
+                print("Necesita recargar Saldo insuficiente")
+            sql="UPDATE banco SET saldo=? WHERE numeroCuenta=?"
+            parametros=(nuevoSaldo,cuentaBanco)
+            self.db.ejecutarConsulta(sql,parametros)
+            return 1
+        else:
+            return 2
+    def recargarSaldo(self,cuentaBanco):
+        try:
+            sql="SELECT * FROM banco WHERE numeroCuenta=?"
+            resultado=self.db.ejecutarConsulta(sql,(cuentaBanco,)).fetchall()
+            print("="*25)
+            password=input("Password banco: ")
+            if password==resultado[0][2]:
+                recarga=float(input("ingrese monto a recargar: "))
+                nuevoSaldo=recarga+resultado[0][3]
+                sql="UPDATE banco SET saldo=? WHERE numeroCuenta=?"
+                self.db.ejecutarConsulta(sql,(nuevoSaldo,cuentaBanco))
+            else: 
+                print("contraseña incorrecta")
+            print("="*25)
+        except:
+            print("Error al recargar saldo")
+
+    #valentin 
+    def calificarLibro(self,usuario):
+        try:
+            self.MostrarLibro()
+            id=int(input("ingrese el ID libro a calificar: "))
+            if self.buscarLibro(id)==True:
+                calificacion=int(input("Calificacion 0 - 10 :  "))
+                if calificacion>=0 and calificacion <=10:
+                    sql="INSERT INTO calificacion(id_usuario,id_libro,calificacion) VALUES(?,?,?)"
+                    parametros=(usuario,id,calificacion)
+                    self.db.ejecutarConsulta(sql,parametros)
+                    sql="SELECT id_libro from libros"
+                    resultado=self.db.ejecutarConsulta(sql).fetchall()
+                    lista=[]
+                    listaSuma=[]
+                    for dato in resultado:
+                        dato=list(dato)
+                        lista=lista+dato
+                    for id in lista:
+                        suma=0
+                        listaSuma.clear()
+                        sql="SELECT calificacion.calificacion FROM calificacion WHERE id_libro=?"
+                        parametros=(id,)
+                        resultadoSuma=self.db.ejecutarConsulta(sql,parametros).fetchall()
+                        if resultadoSuma!=[]:
+                            for calificacion in resultadoSuma:
+                                calificacion=list(calificacion)
+                                listaSuma=listaSuma+calificacion
+                            suma= sum(listaSuma)/len(listaSuma)
+                            sql="UPDATE libros SET calificacion=? WHERE id_libro=?"
+                            parametros=(suma,id)
+                            self.db.ejecutarConsulta(sql,parametros)
+                        else:
+                            pass
+                    print("calificacion completa")
+                else:
+                    print("Rango calificacion no valido")
+            else:
+                print("no existe el libro")
+        except:
+            print("Error al ingresar el id")
+    
+    def calificarResenia(self):
+        self.verCalificacionResenia()
+        try:
+            idLibro=int(input("ingrese el id del libro"))
+            if self.buscarLibro(idLibro):
+                idResenia=int(input("Ingrese el id de la resenia a calificar "))
+                if self.buscarResenia(idLibro,idResenia):
+                    calificar=input("seleccione 'positivo' 'negativo'= ")
+                    sql="SELECT reseñas.calificacionPos, reseñas.calificacionNeg FROM reseñas WHERE id_reseña=? and id_libro=?"
+                    parametros=(idResenia,idLibro)
+                    resultado=self.db.ejecutarConsulta(sql,parametros).fetchall()
+                    if resultado!=[]:
+                        if calificar=='positivo':
+                            suma=resultado[0][0]+1
+                            sql="UPDATE reseñas SET calificacionPos=? WHERE id_libro=? and id_reseña=?"
+                            parametros=(suma,idLibro,idResenia)
+                            self.db.ejecutarConsulta(sql,parametros)
+                        elif calificar=='negativo':
+                            suma=resultado[0][1]+1
+                            sql="UPDATE reseñas SET calificacionNeg=? WHERE id_libro=? and id_reseña=?"
+                            parametros=(suma,idLibro,idResenia)
+                            self.db.ejecutarConsulta(sql,parametros)
+                else:
+                    print("no existe la reseña")
+            else:
+                print("no existe el libro")
+        except:
+            print("Error al calificar resenia ")
+
+    def VerificarContrasenia(self):
+        usuarioCliente=input("Ingrese usuario: ")
+        contraseniaCliente=input("Ingrese contrasenia: ")
+        sql="SELECT * FROM usuario WHERE nomUsuario =? And contrasenia=?"
+        parametros=(usuarioCliente,contraseniaCliente)
+        resultado=self.db.ejecutarConsulta(sql,parametros)
+        datos=resultado.fetchall()
+        return datos
+
+    #Salomon
+    def venderLibro(self,usuario,cuentaBanco):
+        try:
+            id=int(input("ingrese el ID libro a comprar: "))
+            if self.buscarLibro(id)==True:
+                sql="SELECT * FROM libros WHERE id_libro=?"
+                parametros=(id,)
+                resultado=self.db.ejecutarConsulta(sql,parametros).fetchall()
+                resultadoUsuario=self.db.ejecutarConsulta("SELECT banco.saldo FROM banco WHERE numeroCuenta=?",(cuentaBanco,)).fetchall()
+                if resultado[0][3]<=resultadoUsuario[0][0]:
+                    if self.actualizarSaldo(cuentaBanco,resultado[0][3])==1:
+                        sql="INSERT INTO ventas(id_usuario,id_libro,nombre,autor,precio,categoria,editorial,fechaPub) VALUES(?,?,?,?,?,?,?,?)"
+                        parametros=(usuario,id,resultado[0][1],resultado[0][2],resultado[0][3],resultado[0][4],resultado[0][5],resultado[0][6])
+                        self.db.ejecutarConsulta(sql,parametros)
+                        print("libro comprado")
+                    else:
+                        print("Contrasenia de la cuenta bancaria incorrecta")
+                else:
+                    print("Saldo insuficiente")
+            else:
+                print("no existe el libro")
+            print("-"*25)
+        except:
+            print("Error al ingresar el id")
+
+    def reseniarLibro(self,usuario):
+        try:
+            self.MostrarLibro()
+            id=int(input("ingrese el ID libro a reseñar: "))
+            if self.buscarLibro(id)==True:
+                texto=input("Reseña: ")
+                sql="INSERT INTO reseñas(id_usuario,id_libro,reseña,calificacionPos,calificacionNeg) VALUES(?,?,?,?,?)"
+                parametros=(usuario,id,texto,0,0)
+                self.db.ejecutarConsulta(sql,parametros)
+                print("reseña completa")
+            else:
+                print("no existe el libro")
+        except:
+            print("Error al ingresar el id")
+    
+    def MostrarUsuario(self):
+        sql="SELECT * FROM usuario"
+        resultado=self.db.ejecutarConsulta(sql)
+        datos=resultado.fetchall()
+        for i in range(len(datos)):
+            print("ID usuario", datos[i][0])
+            print("Nombre ", datos[i][1])
+            print("Apellido", datos[i][2])
+            print("CI ", datos[i][3])
+            print("Cuenta Bancaria", datos[i][4])
+            print("Nombre de usuario", datos[i][5])
+            print("Estado ")
+            print(" ")
