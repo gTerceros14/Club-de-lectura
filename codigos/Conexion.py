@@ -57,6 +57,23 @@ class Conexion:
             print("Libro insertado")
         except:
             print("error al registrar libro")
+    def RegistroLibro(self):
+        try:
+            print("Registrar Libro")
+            print("****************")
+            nombre=str(input("Nombre del libro: "))
+            fechaPub=input("Fecha de publicacion: ")
+            autor=str(input("Autor: "))
+            editorial=str(input("Editorial: "))
+            categoria=str(input("categoria: "))
+            precio=int(input("Precio"))
+            calificacion=0
+            parametros=(nombre,fechaPub,autor,editorial,categoria,precio,calificacion)
+            sql="INSERT INTO libros(nombre,fechaPub,autor,editorial,categoria,precio,calificacion) VALUES(?,?,?,?,?,?,?)"
+            self.db.ejecutarConsulta(sql,parametros)
+            print("Libro insertado")
+        except:
+            print("error al registrar libro")
 
     def MostrarLibro(self):
         sql="SELECT * FROM libros"
@@ -84,7 +101,8 @@ class Conexion:
             else:
                 print(" sin reseña")
             print("="*25)
-            print("")      
+            print("")
+            
             
     def ActualizarLibro(self):
         try:
@@ -103,5 +121,15 @@ class Conexion:
                 print(" No existe libro")
         except:
             print(" error al actualizar libro" )
-    
+    def EliminarLibro(self):
+        try:
+            id=int(input("ID libro: "))
+            if self.buscarLibro(id)==True:
+                sql="DELETE FROM libros WHERE id_libro=?"
+                parametros=(id,)
+                self.db.ejecutarConsulta(sql,parametros)
+            else:
+                print("no existe libro")
+        except:
+            print("hubo un error ")	
 
