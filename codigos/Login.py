@@ -76,3 +76,43 @@ class Login:
                     self.ingresar(dato)
             else:
                 print("NO hay usuarios registrados")
+
+        elif dato==2:
+            usuarioAdmin=input("Ingrese usuario: ")
+            contraseniaAdmin=input("Ingrese contrasenia: ")
+            sql="SELECT * FROM administrador WHERE usuarioAdmin =? And contraseniaAdmin=?"
+            parametros=(usuarioAdmin,contraseniaAdmin)
+            resultado=self.db.ejecutarConsulta(sql,parametros)
+            if resultado.fetchall():
+                print("A ingresado al sistema del club de libros como ADMIN: ")
+                opcion=-1
+                while opcion!=0:
+                    print("""
+                    [1]Agregar libro
+                    [2]Eliminar libro
+                    [3]Actualizar contenido del libro
+                    [4]Ver libros
+                    [5]Ver usuarios registrados
+                    [0]Salir""")
+                    try:              
+                        opcion=int(input(">> "))
+                    
+                        if opcion==1:
+                            self._conexion.RegistroLibro()
+                        if opcion==2:
+                            self._conexion.EliminarLibro()
+                        if opcion==3:
+                            self._conexion.ActualizarLibro()
+                        if opcion==4:
+                            self._conexion.MostrarLibro()
+                        if opcion==5:
+                            self._conexion.MostrarUsuario()
+
+                        elif opcion==0:
+                            pass
+                    except:
+                        print("Opcion invalida")
+            else:
+                print("La contrasenia o usuario es incorrecta: ")
+                self.ingresar(dato)
+            
