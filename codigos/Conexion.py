@@ -57,23 +57,6 @@ class Conexion:
             print("Libro insertado")
         except:
             print("error al registrar libro")
-    def RegistroLibro(self):
-        try:
-            print("Registrar Libro")
-            print("****************")
-            nombre=str(input("Nombre del libro: "))
-            fechaPub=input("Fecha de publicacion: ")
-            autor=str(input("Autor: "))
-            editorial=str(input("Editorial: "))
-            categoria=str(input("categoria: "))
-            precio=int(input("Precio"))
-            calificacion=0
-            parametros=(nombre,fechaPub,autor,editorial,categoria,precio,calificacion)
-            sql="INSERT INTO libros(nombre,fechaPub,autor,editorial,categoria,precio,calificacion) VALUES(?,?,?,?,?,?,?)"
-            self.db.ejecutarConsulta(sql,parametros)
-            print("Libro insertado")
-        except:
-            print("error al registrar libro")
 
     def MostrarLibro(self):
         sql="SELECT * FROM libros"
@@ -132,4 +115,33 @@ class Conexion:
                 print("no existe libro")
         except:
             print("hubo un error ")	
+
+    # GERMAN
+    def verCalificacionResenia(self):
+        self.MostrarLibro()
+    
+    def librosComprados(self,id):
+        #sql="SELECT libros.nombre,libros.autor,libros.categoria,libros.editorial,libros.fechaPub,libros.calificacion from ventas,libros WHERE ventas.id_usuario=? and ventas.id_libro=libros.id_libro"
+        sql="SELECT ventas.Nombre, ventas.autor, ventas.categoria, ventas.editorial, ventas.fechapub, ventas.precio from ventas WHERE id_usuario=? " 
+        resultado=self.db.ejecutarConsulta(sql,(id,))
+        datos=resultado.fetchall()
+        for i in range(len(datos)):
+            print("="*25)
+            print("libro # : ",i+1)
+            print("Nombre ", datos[i][0])
+            print("Autor ", datos[i][1])
+            print("Categoria", datos[i][2])
+            print("Editorial", datos[i][3])
+            print("Fecha de publicacion", datos[i][4])
+            print("Precio :",datos[i][5])
+            print("="*25)
+    
+    def verSaldo(self,cuentaBanco):
+        sql="SELECT * FROM banco WHERE numeroCuenta=?"
+        resultado=self.db.ejecutarConsulta(sql,(cuentaBanco,)).fetchall()
+        print("="*25)
+        print("Numero de cuenta: ",resultado[0][1])
+        print("Saldo disponible: ",resultado[0][3])
+        print("="*25)
+        return resultado[0][3]
 
