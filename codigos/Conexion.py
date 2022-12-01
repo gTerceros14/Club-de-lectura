@@ -284,3 +284,56 @@ class Conexion:
         datos=resultado.fetchall()
         return datos
 
+    #Salomon
+    def venderLibro(self,usuario,cuentaBanco):
+        try:
+            id=int(input("ingrese el ID libro a comprar: "))
+            if self.buscarLibro(id)==True:
+                sql="SELECT * FROM libros WHERE id_libro=?"
+                parametros=(id,)
+                resultado=self.db.ejecutarConsulta(sql,parametros).fetchall()
+                resultadoUsuario=self.db.ejecutarConsulta("SELECT banco.saldo FROM banco WHERE numeroCuenta=?",(cuentaBanco,)).fetchall()
+                if resultado[0][3]<=resultadoUsuario[0][0]:
+                    if self.actualizarSaldo(cuentaBanco,resultado[0][3])==1:
+                        sql="INSERT INTO ventas(id_usuario,id_libro,nombre,autor,precio,categoria,editorial,fechaPub) VALUES(?,?,?,?,?,?,?,?)"
+                        parametros=(usuario,id,resultado[0][1],resultado[0][2],resultado[0][3],resultado[0][4],resultado[0][5],resultado[0][6])
+                        self.db.ejecutarConsulta(sql,parametros)
+                        print("libro comprado")
+                    else:
+                        print("Contrasenia de la cuenta bancaria incorrecta")
+                else:
+                    print("Saldo insuficiente")
+            else:
+                print("no existe el libro")
+            print("-"*25)
+        except:
+            print("Error al ingresar el id")
+
+    def reseniarLibro(self,usuario):
+        try:
+            self.MostrarLibro()
+            id=int(input("ingrese el ID libro a reseñar: "))
+            if self.buscarLibro(id)==True:
+                texto=input("Reseña: ")
+                sql="INSERT INTO reseñas(id_usuario,id_libro,reseña,calificacionPos,calificacionNeg) VALUES(?,?,?,?,?)"
+                parametros=(usuario,id,texto,0,0)
+                self.db.ejecutarConsulta(sql,parametros)
+                print("reseña completa")
+            else:
+                print("no existe el libro")
+        except:
+            print("Error al ingresar el id")
+    
+    def MostrarUsuario(self):
+        sql="SELECT * FROM usuario"
+        resultado=self.db.ejecutarConsulta(sql)
+        datos=resultado.fetchall()
+        for i in range(len(datos)):
+            print("ID usuario", datos[i][0])
+            print("Nombre ", datos[i][1])
+            print("Apellido", datos[i][2])
+            print("CI ", datos[i][3])
+            print("Cuenta Bancaria", datos[i][4])
+            print("Nombre de usuario", datos[i][5])
+            print("Estado ")
+            print(" ")
